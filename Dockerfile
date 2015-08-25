@@ -14,18 +14,49 @@ RUN echo "deb http://cran.rstudio.com/bin/linux/ubuntu trusty/" >> /etc/apt/sour
 
 RUN cat /etc/apt/sources.list
 
+# Install basic commands
+RUN apt-get -y install links nano
+
 # Install R
-RUN apt-get update && apt-get install -y r-base
+RUN apt-get update && apt-get install -y r-base r-base-dev
 RUN apt-get update && apt-get install -y libzmq3-dev # https://github.com/IRkernel/IRkernel
 RUN apt-get update && apt-get install -y libcurl4-gnutls-dev # http://stackoverflow.com/questions/26445815/error-when-installing-devtools-package-for-r-in-ubuntu
 RUN apt-get update && apt-get install -y libcurl4-openssl-dev # http://stackoverflow.com/questions/20671814/non-zero-exit-status-r-3-0-1-xml-and-rcurl
 RUN apt-get update && apt-get install -y libxml2-dev # http://stackoverflow.com/questions/20671814/non-zero-exit-status-r-3-0-1-xml-and-rcurl
+
+# Install software needed for common R libraries
+# For RCurl
+RUN apt-get -y install libcurl4-openssl-dev
+# For rJava
+RUN apt-get -y install libpcre++-dev
+RUN apt-get -y install openjdk-7-jdk
+# For XML
+RUN apt-get -y install libxml2-dev
+
+##### R: COMMON PACKAGES
+# To let R find Java
+RUN R CMD javareconf
+
 RUN apt-get clean
 
 # Install R packages
-COPY installRPackages.R /sbin/installRPackages.R
-RUN chmod +x /sbin/installRPackages.R
-RUN /sbin/installRPackages.R
+RUN R -e "install.packages(c('devtools', 'gplots', 'httr', 'igraph', 'knitr', 'methods', 'plyr', 'RColorBrewer', 'rJava', 'rjson', 'R.methodsS3', 'R.oo', 'sqldf', 'stringr', 'testthat', 'XML', 'DT', 'htmlwidgets'), repos='http://cran.rstudio.com/')"
+
+RUN R -e 'setRepositories(ind=1:6); \
+  options(repos="http://cran.rstudio.com/"); \
+  if(!require(devtools)) { install.packages("devtools") }; \
+  library(devtools); \
+  install_github("ramnathv/rCharts");'
+
+# Install Bioconductor
+RUN R -e "source('http://bioconductor.org/biocLite.R'); biocLite(c('Biobase', 'BiocCheck', 'BiocGenerics', 'BiocStyle', 'S4Vectors', 'IRanges', 'AnnotationDbi'))"
+
+# Install rcellminer/paxtoolsr
+RUN R -e "source('http://bioconductor.org/biocLite.R'); biocLite(c('rcellminer', 'paxtoolsr'))"
+
+#COPY installRPackages.R /sbin/installRPackages.R
+#RUN chmod +x /sbin/installRPackages.R
+#RUN /sbin/installRPackages.R
 
 WORKDIR "/"
 RUN mkdir /workspace
