@@ -52,11 +52,13 @@ RUN R -e 'setRepositories(ind=1:6); \
 RUN R -e "source('http://bioconductor.org/biocLite.R'); biocLite(c('Biobase', 'BiocCheck', 'BiocGenerics', 'BiocStyle', 'S4Vectors', 'IRanges', 'AnnotationDbi'))"
 
 # Install rcellminer/paxtoolsr
-RUN R -e "source('http://bioconductor.org/biocLite.R'); biocLite(c('rcellminer', 'paxtoolsr'))"
+RUN R -e "source('http://bioconductor.org/biocLite.R'); biocLite('rcellminer')"
+RUN R -e "source('http://bioconductor.org/biocLite.R'); biocLite('rcellminerData')"
+RUN R -e "source('http://bioconductor.org/biocLite.R'); biocLite('paxtoolsr')"
 
-#COPY installRPackages.R /sbin/installRPackages.R
-#RUN chmod +x /sbin/installRPackages.R
-#RUN /sbin/installRPackages.R
+COPY installRPackages.R /sbin/installRPackages.R
+RUN chmod +x /sbin/installRPackages.R
+RUN /sbin/installRPackages.R
 
 WORKDIR "/"
 RUN mkdir /workspace
