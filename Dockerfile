@@ -49,7 +49,8 @@ RUN R -e 'setRepositories(ind=1:6); \
   options(repos="http://cran.rstudio.com/"); \
   if(!require(devtools)) { install.packages("devtools") }; \
   library(devtools); \
-  install_github("ramnathv/rCharts");'
+  install_github("ramnathv/rCharts"); \
+  install.packages("cgdsr")'
 
 # Install Bioconductor
 RUN R -e "source('http://bioconductor.org/biocLite.R'); biocLite(c('Biobase', 'BiocCheck', 'BiocGenerics', 'BiocStyle', 'S4Vectors', 'IRanges', 'AnnotationDbi'))"
@@ -66,15 +67,14 @@ RUN apt-get upgrade -y
 RUN apt-get install -y software-properties-common
 RUN apt-get install -y python3-pip libzmq-dev
 RUN pip3 install ipython jinja2 pyzmq tornado
-RUN apt-get update
 RUN apt-get clean
 
-WORKDIR "/"
 RUN mkdir /workspace
+WORKDIR /workspace
 COPY examples/rcellminer.ipynb /workspace/rcellminer.ipynb
 
 EXPOSE 8888
-#VOLUME /workspace
+VOLUME /workspace
 
 RUN mkdir /root/.ssh
 VOLUME /root/.ssh
