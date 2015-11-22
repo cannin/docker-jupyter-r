@@ -74,13 +74,11 @@ RUN cd /; git clone https://github.com/chronitis/ipyrmd.git
 RUN cd /ipyrmd; python3 setup.py install
 
 EXPOSE 8888
-VOLUME /workspace
-
-RUN mkdir /root/.ssh
-VOLUME /root/.ssh
 
 RUN mkdir /workspace
+VOLUME /workspace
 WORKDIR /workspace
+
 COPY examples/rcellminer.ipynb /workspace/rcellminer.ipynb
 COPY examples/using_rcellminer.ipynb /workspace/using_rcellminer.ipynb
 
