@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y inkscape   # For nbconvert to work with
 # RUN apt-get update && apt-get install -y texlive-latex-extra   # required for adjustbox.sty, probably is an easier way
 
 # Install basic commands
-RUN apt-get -y install links nano
+RUN apt-get -y install links nano wget git
 
 # Install new version of R
 RUN sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9
@@ -66,8 +66,12 @@ RUN apt-get update
 RUN apt-get upgrade -y
 RUN apt-get install -y software-properties-common
 RUN apt-get install -y python3-pip libzmq-dev
-RUN pip3 install ipython jinja2 pyzmq tornado
+RUN pip3 install ipython jinja2 pyzmq tornado pyyaml
+
 RUN apt-get clean
+
+RUN cd /; git clone https://github.com/chronitis/ipyrmd.git
+RUN cd /ipyrmd; python3 setup.py install
 
 RUN mkdir /workspace
 WORKDIR /workspace

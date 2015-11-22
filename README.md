@@ -2,8 +2,10 @@
 ## Single Instance
 ```
 docker build -t cannin/jupyter-r .
-docker run -i -t cannin/jupyter-r /bin/bash
-docker run -p 8888:8888 cannin/jupyter-r
+
+docker run --name jupyter -p 8888:8888 -t cannin/jupyter-r /bin/bash
+docker exec -t jupyter-r /bin/bash
+
 docker run -p 8888:8888 -v DIR:/workspace cannin/jupyter-r
 ```
 
