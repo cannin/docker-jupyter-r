@@ -3,7 +3,7 @@
 ```
 docker build -t cannin/jupyter-r .
 
-docker run --name jupyter -p 8888:8888 -t cannin/jupyter-r /bin/bash
+docker run -i --name jupyter -p 8888:8888 -t cannin/jupyter-r /bin/bash
 docker exec -t jupyter-r /bin/bash
 
 docker run -p 8888:8888 -v DIR:/workspace cannin/jupyter-r
@@ -17,7 +17,21 @@ export TOKEN=$( head -c 30 /dev/urandom | xxd -p )
 docker run --net=host -d -e CONFIGPROXY_AUTH_TOKEN=$TOKEN --name=proxy jupyter/configurable-http-proxy --default-target http://127.0.0.1:9999
 docker run --net=host -d -e CONFIGPROXY_AUTH_TOKEN=$TOKEN --name=tmpnb \
            -v /var/run/docker.sock:/docker.sock \
-           cannin/tmpnb python orchestrate.py --image='cannin/jupyter-r'
+           cannin/tmpnb python orchestrate.py \
+           --image='cannin/jupyter-r' \
+           --pool_size=3 \
+           --cull_period=600 \
+           --cull_timeout=3600
+```
+
+## Stop and remove all tmpnb/Jupyter containers
+```
+sudo docker stop tmpnb
+sudo docker stop proxy
+
+sudo docker ps -a | grep jupyter | cut -d ' ' -f 1 | xargs sudo docker stop 
+
+sudo docker ps -a | grep Exit | cut -d ' ' -f 1 | xargs sudo docker rm
 ```
 
 ## Access Jupyter server

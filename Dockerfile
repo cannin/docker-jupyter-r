@@ -73,15 +73,16 @@ RUN apt-get clean
 RUN cd /; git clone https://github.com/chronitis/ipyrmd.git
 RUN cd /ipyrmd; python3 setup.py install
 
-RUN mkdir /workspace
-WORKDIR /workspace
-COPY examples/rcellminer.ipynb /workspace/rcellminer.ipynb
-
 EXPOSE 8888
 VOLUME /workspace
 
 RUN mkdir /root/.ssh
 VOLUME /root/.ssh
+
+RUN mkdir /workspace
+WORKDIR /workspace
+COPY examples/rcellminer.ipynb /workspace/rcellminer.ipynb
+COPY examples/using_rcellminer.ipynb /workspace/using_rcellminer.ipynb
 
 # https://github.com/ipython/ipython/issues/7062
 CMD sh -c "ipython notebook --ip=*"
