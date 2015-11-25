@@ -66,7 +66,7 @@ RUN apt-get update
 RUN apt-get upgrade -y
 RUN apt-get install -y software-properties-common
 RUN apt-get install -y python3-pip libzmq-dev
-RUN pip3 install ipython jinja2 pyzmq tornado pyyaml
+RUN pip3 install ipython jinja2 pyzmq tornado pyyaml rpy2
 
 RUN apt-get clean
 
