@@ -1,0 +1,229 @@
+---
+title: "Introduction to the CGDS R library"
+author: "Anders Jacobsen"
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output:
+  html_document:
+    toc: yes
+---
+
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{Introduction to the CGDS R library}
+%\VignetteKeywords{cgdsr}
+%\VignetteDepends{cgdsr}
+%\VignettePackage{cgdsr}
+-->
+
+```{r knitrSetup, include=FALSE}
+library(knitr)
+opts_chunk$set(out.extra='style="display:block; margin: auto"', fig.align="center", tidy=TRUE)
+```
+
+# Introduction
+
+This package provides a basic set of R functions for querying
+the Cancer Genomic Data Server (CGDS) hosted by the Computational
+Biology Center (cBio) at the Memorial Sloan-Kettering Cancer Center (MSKCC). This
+service is a part of the cBio Cancer Genomics Portal, [http://www.cbioportal.org/](http://www.cbioportal.org/).
+
+In summary, the library can issue the following types of queries:
+
+* getCancerStudies(): What cancer studies are hosted on the server?
+For example, TCGA glioblastoma or TCGA ovarian cancer.
+
+* getGeneticProfiles(): What genetic profile types are available for
+cancer study X? For example, mRNA expression or copy number alterations.
+
+* getCaseLists(): what case sets are available for cancer study X? For
+example, all samples or only samples corresponding to a given cancer subtype.
+
+* getProfileData(): Retrieve slices of genomic data.  For
+example, a client can retrieve all mutation data for PTEN and EGFR in
+TCGA glioblastoma.
+
+* getClinicalData(): Retrieve clinical data (e.g. patient
+survival time and age) for a given cancer study and list of cases.
+
+Each of these functions will be briefly described in the following
+sections. The last part of this document includes some concrete examples
+of how to access and plot the data.
+
+The purpose of this document is to give the reader a quick overview of
+the **cgdsr** package. Please refer to the corresponding R manual
+pages for a more detailed explanation of arguments and output for each
+function.
+
+# The CGDS R interface
+
+## CGDS(): Create a CGDS connection object
+Initially, we will establish a connection to the public CGDS
+server hosted by Memorial Sloan-Kettering Cancer Center. The function
+for creating a CGDS connection object requires the URL of the CGDS
+server service, in this case [http://www.cbioportal.org/](http://www.cbioportal.org/), as an argument.
+
+```{r}
+library(cgdsr)
+# Create CGDS object
+mycgds <- CGDS("http://www.cbioportal.org/")
+```
+
+The variable **mycgds** is now a CGDS connection object
+pointing at the URL for the public CGDS server. This connection object must
+be included as an argument to all subsequent interface
+calls. Optionally, we can now perform a set of simple tests of the data
+returned from the CGDS connection object using the **test** function:
+
+```{r}
+# Test the CGDS endpoint URL using a few simple API tests
+test(mycgds) 
+```
+
+## getCancerStudies(): Retrieve a set of available cancer studies
+
+Having created a CGDS connection object, we can now retrieve a data
+frame with available cancer studies using the **getCancerStudies** function: 
+
+```{r}
+# Get list of cancer studies at server
+# NOTE: Only show the first few with head()
+head(getCancerStudies(mycgds)[, c(1,2)])
+```
+
+Here we are only showing the first two columns, the cancer study ID and
+short name, of the result data frame. There is also a third column,
+a longer description of the cancer study. The cancer study ID must be
+used in subsequent interface calls to retrieve case lists and genetic
+data profiles (see below).
+
+## getGeneticProfiles(): Retrieve genetic data profiles for a specific cancer study
+This function queries the CGDS API and returns the available genetic
+profiles, e.g. mutation or copy number profiles, stored about a
+specific cancer study. Below we list the current genetic profiles for
+the TCGA glioblastoma cancer study:
+
+```{r}
+head(getGeneticProfiles(mycgds,'gbm_tcga')[,c(1:2)])
+```
+
+Here we are only listing the first two columns, genetic profile ID and
+short name, of the resulting data frame. Please refer to the R manual
+pages for a more extended specification of the arguments and output.
+
+
+## getCaseLists(): Retrieve case lists for a specific cancer study
+This function queries the CGDS API and returns available case lists
+for a specific cancer study. For example, within a particular study, only
+some cases may have sequence data, and another subset of cases may
+have been sequenced and treated with a specific therapeutic protocol.  Multiple 
+case lists may be associated with each cancer study, and this method
+enables you to retrieve meta-data regarding all of these case
+lists. Below we list the current case lists for the TCGA glioblastoma
+cancer study:
+
+```{r}
+getCaseLists(mycgds,'gbm_tcga')[,c(1:2)]
+```
+
+Here we are only listing the first two columns, case list ID and
+short name, of the resulting data frame. Please refer to the R manual
+pages for a more extended specification of the arguments and output.
+
+## getProfileData(): Retrieve genomic profile data for genes and genetic profiles
+The function queries the CGDS API and returns data based on gene(s),
+genetic profile(s), and a case list. The function only allows
+specifying a list of genes and a single genetic profile, or oppositely
+a single gene and a list of genetic profiles. Importantly, the format of the output
+data frame depends on if a single or a list of genes was specified in
+the arguments. Below we are retrieving mRNA expression and copy number
+alteration genetic profiles for the NF1 gene in all samples of the TCGA glioblastoma
+cancer study:
+
+```{r}
+getProfileData(mycgds, "NF1", c("gbm_tcga_gistic","gbm_tcga_mrna"), "gbm_tcga_all")[c(1:5),]
+```
+
+We are here only showing the first five rows of the data frame. In the next example, we are
+retrieving mRNA expression data for the MDM2 and MDM4 genes:
+
+```{r}
+getProfileData(mycgds, c("MDM2","MDM4"), "gbm_tcga_mrna", "gbm_tcga_all")[c(1:5),]
+```
+
+We are again only showing the first five rows of the data frame.
+
+## getClinicalData(): Retrieve clinical data for a list of cases
+The function queries the CGDS API and returns available clinical data (e.g. patient
+survival time and age) for a given case list. Results are returned in
+a data frame with a row for each case and a column for each clinical
+attribute. The available clinical attributes are:
+
+* overall_survival_months: Overall survival, in months.
+* overall_survival_status: Overall survival status, usually indicated as "LIVING" or "DECEASED".
+* disease_free_survival_months: Disease free survival, in months.
+* disease_free_survival_status: Disease free survival status, usually indicated as "DiseaseFree" or "Recurred/Progressed".
+* age_at_diagnosis: Age at diagnosis.
+
+Below we retrieve clinical data for the TCGA ovarian cancer dataset (only first five
+cases/rows are shown):
+
+```{r}
+getClinicalData(mycgds, "ova_all")[c(1:5),]
+```
+
+# Examples
+
+## Example 1: Association of NF1 copy number alteration and mRNA expression in glioblastoma
+As a simple example, we will generate a plot of the association between
+copy number alteration (CNA) status and mRNA expression change for the
+NF1 tumor suprpressor gene in glioblastoma. This plot is very similar
+to Figure 2b in the TCGA research network paper on glioblastoma
+(McLendon et al. 2008). The mRNA expression of NF1 has been 
+median adjusted on the gene level (by globally subtracting the median expression
+level of NF1 across all samples).
+
+```{r NF1plot1, fig.show=TRUE, echo=TRUE}
+df <- getProfileData(mycgds, "NF1", c("gbm_tcga_gistic","gbm_tcga_mrna"), "gbm_tcga_all")
+head(df)
+boxplot(df[,2] ~ df[,1], main="NF1 : CNA status vs mRNA expression", xlab="CNA status", ylab="mRNA expression", outpch = NA)
+stripchart(df[,2] ~ df[,1], vertical=T, add=T, method="jitter",pch=1,col='red')
+```
+
+Alternatively, the generic **cgdsr** **plot()**
+function can be used to generate a similar plot:
+
+```{r NF1plot2, fig.show=TRUE, echo=TRUE}
+plot(mycgds, "gbm_tcga", "NF1", c("gbm_tcga_gistic","gbm_tcga_mrna"), "gbm_tcga_all", skin = 'disc_cont')
+```
+
+## Example 2: MDM2 and MDM4 mRNA expression levels in glioblastoma
+In this example, we evaluate the relationship of MDM2 and MDM4
+expression levels in glioblastoma. mRNA expression levels of MDM2 and MDM4 have been 
+median adjusted on the gene level (by globally subtracting the median expression
+level of the individual gene across all samples).
+
+```{r MDM2plot1, fig.show=TRUE, echo=TRUE}
+df <- getProfileData(mycgds, c("MDM2","MDM4"), "gbm_tcga_mrna", "gbm_tcga_all")
+head(df)
+plot(df, main="MDM2 and MDM4 mRNA expression", xlab="MDM2 mRNA expression", ylab="MDM4 mRNA expression")
+```
+
+Alternatively, the generic **cgdsr** **plot()**
+function can be used to generate a similar plot:
+
+```{r MDMplot2, fig.show=TRUE, echo=TRUE}
+plot(mycgds, "gbm_tcga", c("MDM2","MDM4"), "gbm_tcga_mrna" ,"gbm_tcga_all")
+```
+
+## Example 3: Comparing expression of PTEN in primary and metastatic prostate cancer tumors
+In this example we plot the mRNA expression levels of PTEN in primary
+and metastatic prostate cancer tumors.
+
+```{r PTENplot, fig.show=TRUE, echo=TRUE}
+df.pri <- getProfileData(mycgds, "PTEN", "prad_mskcc_mrna", "prad_mskcc_primary")
+head(df.pri)
+df.met <- getProfileData(mycgds, "PTEN", "prad_mskcc_mrna", "prad_mskcc_mets")
+head(df.met)
+boxplot(list(t(df.pri),t(df.met)), main="PTEN expression in primary and metastatic tumors", xlab="Tumor type", ylab="PTEN mRNA expression",names=c('primary','metastatic'), outpch = NA)
+stripchart(list(t(df.pri),t(df.met)), vertical=T, add=T, method="jitter",pch=1,col='red')
+```

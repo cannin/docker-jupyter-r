@@ -1,0 +1,198 @@
+---
+title: "Using R"
+author: "Augustin Luna"
+date: "`r format(Sys.time(), '%b %d, %Y')`"
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, echo=FALSE, warning=FALSE, message=FALSE}
+require("knitr")
+opts_chunk$set(fig.align="center", fig.width=6, fig.height=6, dpi=150)
+```
+
+# Basics:
+From: https://github.com/Data-Camp/introduction_to_R/blob/master/chapter1.Rmd
+
+## Simple calculations 
+```{r}
+2 + 2
+```
+
+## Comment Code
+```{r}
+# This is a comment 
+2 + 2 
+
+# Addition
+5 + 5 
+
+# Subtraction
+5 - 5 
+
+# Multiplication
+3 * 5
+
+# Division
+(5 + 5) / 2 
+```
+
+## Variable assignment 
+```{r}
+my_variable <- 4
+```
+
+## Basic Data Types
+```{r}
+# What is the answer to the universe?
+my_numeric <- 42
+
+# The quotation marks indicate that the variable is of type character
+my_character <- "some text"
+
+# Change the value of my_logical
+my_logical <- TRUE
+```
+
+# Help 
+
+## Help 
+```{r}
+?mean
+```
+
+# Vectors 
+From: https://github.com/Data-Camp/introduction_to_R/blob/master/chapter2.Rmd
+
+## Creating a vector
+```{r}
+numeric_vector <- c(1, 2, 3)
+character_vector <- c("a", "b", "c")
+boolean_vector <- c(TRUE, FALSE, FALSE)
+```
+
+## Selection by index 
+```{r}
+numeric_vector[c(1, 3)]
+```
+
+## Selection by logical
+```{r}
+my_variable <- 2
+result <- numeric_vector[numeric_vector > my_variable]
+```
+
+# Matrices 
+From: https://github.com/Data-Camp/introduction_to_R/blob/master/chapter3.Rmd
+
+## Matrices from vectors
+```{r}
+first_row <- c(6,8,7,9,9,10)
+second_row <- c(6,8,7,5,9,6)
+third_row <- c(5,4,6,6,7,8)
+fourth_row <- c(4,5,3,4,6,8)
+
+# Combine multiple vectors to form a matrix
+theater <- rbind(first_row, second_row, third_row, fourth_row)
+row_scores <- rowSums(theater)
+scores <- cbind(theater, row_scores)
+```
+
+## Naming a matrix 
+```{r}
+rownames(scores) <- c("row1", "row2", "row3", "row4")
+colnames(scores) <- c("col1", "col2", "col3","col4", "col5", "col6", "total")
+```
+
+## Size of matrix 
+```{r}
+ncol(scores)
+nrow(scores)
+dim(scores)
+```
+
+## Selecting elements 
+### Select rows and columns
+```{r}
+i <- 1 
+j <- 1 
+
+scores[i,]
+scores[,j]
+scores[i,j]
+```
+
+# Data Frames 
+```{r}
+data(iris)
+head(iris)
+```
+
+## Rename data.frame columns 
+```{r}
+numeric_vector <- c(1, 2, 3)
+character_vector <- c("a", "b", "c")
+boolean_vector <- c(TRUE, FALSE, FALSE)
+
+df <- data.frame(numbers=numeric_vector, characters=character_vector, boolean=boolean_vector)
+```
+
+## Selecting columns by name
+```{r}
+iris[,"Sepal.Length"]
+iris$Sepal.Length
+```
+
+# Exporting data 
+
+## Writing files 
+```{r}
+write.table(iris, file="iris.txt", sep="\t", row.names=TRUE, col.names=TRUE, quote=FALSE)
+```
+
+## Reading files 
+```{r}
+df <- read.table("iris.txt", sep="\t", header=TRUE)
+```
+
+# Plotting 
+From: https://github.com/Data-Camp/introduction_to_R/blob/master/chapter7.Rmd
+
+## Histogram
+```{r}
+hist(iris$Sepal.Length)
+```
+
+## Scatterplot 
+```{r}
+plot(x=iris$Sepal.Length, 
+     y=iris$Sepal.Width,
+     main = "Sepal Length versus Sepal Width",
+     xlab = "Sepal Length",
+     ylab = "Sepal Width",
+     col = "red")
+```
+
+# R Packages 
+From: http://www.jkarreth.net/files/RPOS517_Day1_IntroR.pdf 
+
+## Install packages from repositories 
+```{r, eval=FALSE}
+# From CRAN (for general packages)
+install.packages("foreign")
+
+# From Bioconductor (for biology-related packages)
+source("https://bioconductor.org/biocLite.R")
+biocLite("rcellminer")
+```
+
+## Load package 
+```{r, eval=FALSE}
+library(rcellminer)
+```
+
+## Package help
+```{r, eval=FALSE}
+help(package="rcellminer")
+```

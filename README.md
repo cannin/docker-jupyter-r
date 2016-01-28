@@ -4,7 +4,7 @@
 docker build -t cannin/jupyter-r .
 
 docker run -i --name jupyter -p 8888:8888 -t cannin/jupyter-r /bin/bash
-docker exec -t jupyter-r /bin/bash
+docker exec -t jupyter /bin/bash
 
 docker run -p 8888:8888 -v DIR:/workspace cannin/jupyter-r
 ```
@@ -21,7 +21,7 @@ docker run --net=host -d -e CONFIGPROXY_AUTH_TOKEN=$TOKEN --name=tmpnb \
            --image='cannin/jupyter-r' \
            --pool_size=3 \
            --cull_period=600 \
-           --cull_timeout=3600
+           --cull_timeout=3600        
 ```
 
 ## Stop and remove all tmpnb/Jupyter containers
@@ -36,3 +36,20 @@ sudo docker ps -a | grep Exit | cut -d ' ' -f 1 | xargs sudo docker rm
 
 ## Access Jupyter server
 * URL: http://ROOT_URL:8000/user/PUT_ANY_USERNAME_HERE
+
+## Access ipyrmd 
+```
+# ipyrmd from: https://github.com/chronitis/ipyrmd
+docker run -i -v HOST_PATH:/tmp -t cannin/jupyter-r /bin/bash
+
+# Run ipyrmd
+```
+ipyrmd --to ipynb --from Rmd -y -o OUT IN
+
+# Included files
+ipyrmd --to ipynb --from Rmd -y -o using_r.ipynb using_r.Rmd
+ipyrmd --to ipynb --from Rmd -y -o intro_machine_learning.ipynb intro_machine_learning.Rmd
+ipyrmd --to ipynb --from Rmd -y -o using_rcellminer.ipynb using_rcellminer.Rmd
+ipyrmd --to ipynb --from Rmd -y -o using_paxtoolsr.ipynb using_paxtoolsr.Rmd
+ipyrmd --to ipynb --from Rmd -y -o cgdsr.ipynb cgdsr.Rmd
+```
