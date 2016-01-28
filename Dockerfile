@@ -79,8 +79,9 @@ RUN mkdir /workspace
 VOLUME /workspace
 WORKDIR /workspace
 
-COPY examples/rcellminer.ipynb /workspace/rcellminer.ipynb
+COPY examples/using_paxtoolsr.ipynb /workspace/using_paxtoolsr.ipynb
 COPY examples/using_rcellminer.ipynb /workspace/using_rcellminer.ipynb
+COPY examples/cgdsr.ipynb /workspace/cgdsr.ipynb
 
 # https://github.com/ipython/ipython/issues/7062
 CMD sh -c "ipython notebook --ip=*"
