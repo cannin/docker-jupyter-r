@@ -1,4 +1,4 @@
-FROM jupyter/notebook
+FROM jupyter/notebook:stable
 
 # The following would be required to enable exporting of ipynbs but creates too large an image for docker hub
 # TODO: how to enable adjustbox without pulling down 3G of data
