@@ -4,6 +4,7 @@
 docker build -t cannin/jupyter-r .
 
 docker run -i --name jupyter -p 8888:8888 -t cannin/jupyter-r /bin/bash
+docker run --name jupyter -p 8888:8888 -t cannin/jupyter-r
 docker exec -t jupyter /bin/bash
 
 docker run -p 8888:8888 -v DIR:/workspace cannin/jupyter-r
@@ -37,7 +38,7 @@ sudo docker ps -a | grep Exit | cut -d ' ' -f 1 | xargs sudo docker rm
 ## Access Jupyter server
 * URL: http://ROOT_URL:8000/user/PUT_ANY_USERNAME_HERE
 
-## Access ipyrmd 
+## Access ipyrmd
 ```
 # ipyrmd from: https://github.com/chronitis/ipyrmd
 docker run -i -v HOST_PATH:/tmp -t cannin/jupyter-r /bin/bash

@@ -33,6 +33,16 @@ RUN apt-get -y install openjdk-7-jdk
 # For XML
 RUN apt-get -y install libxml2-dev
 
+##### PYTHON PACKAGES
+# Install additional python packages
+RUN apt-get update
+RUN apt-get upgrade -y
+RUN apt-get install -y software-properties-common
+RUN apt-get install -y python3-pip libzmq3
+RUN pip3 install ipython jinja2 pyzmq tornado pyyaml rpy2
+
+RUN apt-get clean
+
 ##### R: COMMON PACKAGES
 # To let R find Java
 RUN R CMD javareconf
@@ -57,18 +67,10 @@ RUN R -e "source('http://bioconductor.org/biocLite.R'); biocLite(c('Biobase', 'B
 
 # Install rcellminer/paxtoolsr
 RUN R -e "source('http://bioconductor.org/biocLite.R'); biocLite('rcellminer')"
-RUN R -e "source('http://bioconductor.org/biocLite.R'); biocLite('rcellminerData')"
+#RUN R -e "source('http://bioconductor.org/biocLite.R'); biocLite('rcellminerData')"
 RUN R -e "source('http://bioconductor.org/biocLite.R'); biocLite('paxtoolsr')"
 
-##### PYTHON PACKAGES
-# Install additional python packages
-RUN apt-get update
-RUN apt-get upgrade -y
-RUN apt-get install -y software-properties-common
-RUN apt-get install -y python3-pip libzmq-dev
-RUN pip3 install ipython jinja2 pyzmq tornado pyyaml rpy2
-
-RUN apt-get clean
+##### INSTALL IPYRMD
 
 RUN cd /; git clone https://github.com/chronitis/ipyrmd.git
 RUN cd /ipyrmd; python3 setup.py install
