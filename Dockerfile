@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y inkscape   # For nbconvert to work with
 # RUN apt-get update && apt-get install -y texlive-latex-extra   # required for adjustbox.sty, probably is an easier way
 
 # Install basic commands
-RUN apt-get -y install links nano wget git
+RUN apt-get -y install links nano wget git htop
 
 # Install new version of R
 RUN sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9
@@ -55,20 +55,8 @@ RUN /sbin/installRPackages.R
 # Install R packages
 RUN R -e "install.packages(c('devtools', 'gplots', 'httr', 'igraph', 'knitr', 'methods', 'plyr', 'RColorBrewer', 'rJava', 'rjson', 'R.methodsS3', 'R.oo', 'sqldf', 'stringr', 'testthat', 'XML', 'DT', 'htmlwidgets'), repos='http://cran.rstudio.com/')"
 
-RUN R -e 'setRepositories(ind=1:6); \
-  options(repos="http://cran.rstudio.com/"); \
-  if(!require(devtools)) { install.packages("devtools") }; \
-  library(devtools); \
-  install_github("ramnathv/rCharts"); \
-  install.packages("cgdsr")'
-
 # Install Bioconductor
 RUN R -e "source('http://bioconductor.org/biocLite.R'); biocLite(c('Biobase', 'BiocCheck', 'BiocGenerics', 'BiocStyle', 'S4Vectors', 'IRanges', 'AnnotationDbi'))"
-
-# Install rcellminer/paxtoolsr
-RUN R -e "source('http://bioconductor.org/biocLite.R'); biocLite('rcellminer')"
-#RUN R -e "source('http://bioconductor.org/biocLite.R'); biocLite('rcellminerData')"
-RUN R -e "source('http://bioconductor.org/biocLite.R'); biocLite('paxtoolsr')"
 
 ##### INSTALL IPYRMD
 
@@ -80,10 +68,6 @@ EXPOSE 8888
 RUN mkdir /workspace
 VOLUME /workspace
 WORKDIR /workspace
-
-COPY examples/using_paxtoolsr.ipynb /workspace/using_paxtoolsr.ipynb
-COPY examples/using_rcellminer.ipynb /workspace/using_rcellminer.ipynb
-COPY examples/cgdsr.ipynb /workspace/cgdsr.ipynb
 
 # https://github.com/ipython/ipython/issues/7062
 CMD sh -c "ipython notebook --ip=*"
