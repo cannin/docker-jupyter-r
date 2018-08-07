@@ -46,8 +46,10 @@ docker run -i -v HOST_PATH:/tmp -t cannin/jupyter-r /bin/bash
 # Run ipyrmd
 ```
 ipyrmd --to ipynb --from Rmd -y -o OUT IN
+```
 
 # Included files
+```
 ipyrmd --to ipynb --from Rmd -y -o using_r.ipynb using_r.Rmd
 ipyrmd --to ipynb --from Rmd -y -o intro_machine_learning.ipynb intro_machine_learning.Rmd
 ipyrmd --to ipynb --from Rmd -y -o using_rcellminer.ipynb using_rcellminer.Rmd
